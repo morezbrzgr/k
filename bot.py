@@ -3,7 +3,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from telegram.ext import CallbackContext
 
 # توکن ربات تلگرام شما
-TOKEN = 7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA
+TOKEN = "7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA"
 
 # فقط شما می‌توانید آیدی طرف مقابل رو ببینید
 YOUR_ID = @morezbrzgr  # این رو با آیدی خودتون جایگزین کنید
