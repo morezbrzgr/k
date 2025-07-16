@@ -162,5 +162,4 @@ async def main():
 # فراخوانی تابع اصلی
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(main())
-
+    asyncio.run(main())  # در محیط‌هایی که event loop به‌طور خودکار اجرا می‌شود، اینجا از await استفاده کنید.
