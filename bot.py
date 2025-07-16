@@ -162,5 +162,19 @@ async def main():
 # فراخوانی تابع اصلی
 if __name__ == "__main__":
     import asyncio
-    asyncio.get_event_loop().run_until_complete(main())  # استفاده از event loop موجود
+    from telegram.ext import Application
+    
+    async def main():
+        application = Application.builder().token(TOKEN).build()
 
+        # اضافه کردن هندلرها
+        application.add_handler(CommandHandler("start", start))
+        application.add_handler(CommandHandler("settings", settings))
+        application.add_handler(CallbackQueryHandler(button))
+        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, receive_anonymous_message))
+        application.add_handler(CommandHandler("help", help_handler))
+
+        # شروع اپلیکیشن
+        await application.run_polling()
+
+    asyncio.get_event_loop().run_until_complete(main())  # استفاده از event loop موجود
