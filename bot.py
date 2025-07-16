@@ -1,8 +1,10 @@
 import logging
+import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, CallbackContext
 
-TOKEN = "7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA"
+# دریافت توکن از متغیر محیطی (در صورت نیاز به تغییر)
+TOKEN = os.getenv("7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA")
 ADMIN_ID = 651775664  # ایدی ادمین
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -56,7 +58,7 @@ async def get_users(update: Update, context: CallbackContext):
     await update.message.reply_text("کاربران جدید از لینک ناشناس وارد شده‌اند.")
 
 # تابع اصلی که اپلیکیشن را راه‌اندازی می‌کند
-def main():
+async def main():
     application = Application.builder().token(TOKEN).build()
 
     # اضافه کردن هندلرها
@@ -65,9 +67,9 @@ def main():
     application.add_handler(CallbackQueryHandler(button))
 
     # اجرای ربات با polling
-    application.run_polling()
+    await application.run_polling()
 
 # اجرای ربات
 if __name__ == "__main__":
-    main()
-
+    import asyncio
+    asyncio.run(main())
