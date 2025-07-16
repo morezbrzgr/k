@@ -1,81 +1,64 @@
-from telegram.ext import Application, CommandHandler, CallbackContext
+import logging
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, CallbackContext
 
-# توکن ربات خود را اینجا قرار دهید
 TOKEN = "7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA"
-async def start(update, context):
-    # دستورات ربات
-    await update.message.reply("سلام!")
+ADMIN_ID = 651775664  # ایدی ادمین
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+async def start(update: Update, context: CallbackContext):
+    if update.effective_user.id != ADMIN_ID:
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f"کاربر جدید وارد ربات شد. شناسه کاربری: {update.effective_user.id}")
+    
+    keyboard = [
+        [InlineKeyboardButton("تنظیمات", callback_data='settings')],
+        [InlineKeyboardButton("راهنما", callback_data='help')],
+        [InlineKeyboardButton("پیام به گروه", callback_data='send_to_group')],
+        [InlineKeyboardButton("لینک ناشناس من", callback_data='anonymous_link')],
+        [InlineKeyboardButton("به مخاطب خاصم وصلم کن", callback_data='special_contact')]
+    ]
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await update.message.reply_text("سلام! لطفاً یکی از گزینه‌ها را انتخاب کنید:", reply_markup=reply_markup)
+
+async def button(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == 'settings':
+        await query.edit_message_text(text="این بخش تنظیمات است.")
+    
+    elif query.data == 'help':
+        await query.edit_message_text(text="برای استفاده از ربات از دکمه‌ها استفاده کنید.")
+    
+    elif query.data == 'send_to_group':
+        await query.edit_message_text(text="پیام به گروه ارسال شد.")
+    
+    elif query.data == 'anonymous_link':
+        user_id = update.effective_user.id
+        anonymous_link = f"https://t.me/{context.bot.username}?start={user_id}"
+        await query.edit_message_text(text=f"لینک ناشناس شما: {anonymous_link}")
+    
+    elif query.data == 'special_contact':
+        await query.edit_message_text(text="شما به مخاطب خاص وصل شدید.")
+
+async def get_users(update: Update, context: CallbackContext):
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("شما دسترسی ندارید!")
+        return
+    await update.message.reply_text("کاربران جدید از لینک ناشناس وارد شده‌اند.")
 
 async def main():
     application = Application.builder().token(TOKEN).build()
-    # اضافه کردن هندلر به ربات
     application.add_handler(CommandHandler("start", start))
-    # اجرای ربات
+    application.add_handler(CommandHandler("get_users", get_users))
+    application.add_handler(CallbackQueryHandler(button))
     await application.run_polling()
 
 if __name__ == '__main__':
     import asyncio
     asyncio.run(main())
-
-# فقط شما می‌توانید آیدی طرف مقابل رو ببینید
-YOUR_ID = 651775664  # این رو با آیدی خودتون جایگزین کنید
-
-# ذخیره اطلاعات چت‌ها
-chats = {}
-
-async def start(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text(
-        "سلام! این ربات برای چت ناشناس است. با ارسال پیام، شروع به چت کنید."
-    )
-
-async def forward_message(update: Update, context: CallbackContext) -> None:
-    chat_id = update.message.chat.id
-    text = update.message.text
-
-    # اگر پیام از طرف خود شما نیست، آن رو به کاربر دیگه ارسال کن
-    if chat_id != YOUR_ID:
-        # پیدا کردن چت ناشناس بعدی
-        other_chat_id = None
-        for user_id, chat in chats.items():
-            if user_id != chat_id and chat["active"] == False:
-                other_chat_id = user_id
-                break
-        
-        # اگر چت ناشناس پیدا شد، پیام رو ارسال کن
-        if other_chat_id:
-            chats[other_chat_id]["active"] = True
-            chats[chat_id]["active"] = True
-            await context.bot.send_message(other_chat_id, f"پیام از {chat_id}: {text}")
-        
-        # ذخیره چت‌های ناشناس
-        if chat_id not in chats:
-            chats[chat_id] = {"active": False}
-
-        # ارسال پاسخ که چت به طور ناشناس شروع شده
-        await update.message.reply_text("پیام شما به طرف دیگر ارسال شد.")
-    else:
-        await update.message.reply_text("شما نمی‌توانید پیام خودتان را ارسال کنید.")
-
-async def show_user_id(update: Update, context: CallbackContext) -> None:
-    if update.message.chat.id == YOUR_ID:
-        for user_id, chat in chats.items():
-            if chat["active"]:
-                await update.message.reply_text(f"آیدی طرف مقابل: {user_id}")
-    else:
-        await update.message.reply_text("شما نمی‌توانید آیدی طرف مقابل را ببینید.")
-
-async def main() -> None:
-    application = Application.builder().token(TOKEN).build()
-
-    # دستورات ربات
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("myid", show_user_id))  # فقط خودتون می‌تونید اینو استفاده کنید
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, forward_message))
-
-    # شروع ربات
-    await application.run_polling()
-
-if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
-
