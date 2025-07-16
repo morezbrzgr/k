@@ -1,8 +1,8 @@
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters
 from telegram.ext import CallbackContext
 
-# 7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA
+# توکن ربات تلگرام شما
 TOKEN = "YOUR_BOT_TOKEN"
 
 # فقط شما می‌توانید آیدی طرف مقابل رو ببینید
@@ -60,38 +60,12 @@ def main() -> None:
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("myid", show_user_id))  # فقط خودتون می‌تونید اینو استفاده کنید
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, forward_message))
+    dp.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, forward_message))
 
     # شروع ربات
     updater.start_polling()
 
     # ربات رو در حالت دائمی راه‌اندازی می‌کنیم
-    updater.idle()
-
-if __name__ == '__main__':
-    main()
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler
-from telegram.ext import filters
-
-def start(update: Update, context):
-    update.message.reply_text("سلام! من ربات چت ناشناس هستم.")
-
-def handle_message(update: Update, context):
-    # اینجا کد خودت رو برای ارسال پیام یا پردازش پیام‌ها بنویس
-    update.message.reply_text("پیامی دریافت شد!")
-
-def main():
-    updater = Updater("YOUR_API_KEY", use_context=True)
-    dp = updater.dispatcher
-
-    # اضافه کردن CommandHandler
-    dp.add_handler(CommandHandler("start", start))
-    
-    # اضافه کردن MessageHandler
-    dp.add_handler(MessageHandler(filters.TEXT, handle_message))  # تغییرات جدید فیلترها
-
-    updater.start_polling()
     updater.idle()
 
 if __name__ == '__main__':
