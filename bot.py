@@ -1,3 +1,4 @@
+
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from telegram.ext import CallbackContext
@@ -53,7 +54,6 @@ async def show_user_id(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text("شما نمی‌توانید آیدی طرف مقابل را ببینید.")
 
 async def main() -> None:
-    # به روزرسانی ربات
     application = Application.builder().token(TOKEN).build()
 
     # دستورات ربات
