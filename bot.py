@@ -42,6 +42,14 @@ def main():
 
     # ربات را تا وقتی که به صورت دستی متوقف نشود اجرا می‌کند
     updater.idle()
+    from PIL import Image
+
+# باز کردن تصویر
+image = Image.open('your_image.jpg')  # مسیر تصویر خود را وارد کنید
+
+# شناسایی نوع تصویر
+print(f"The image format is: {image.format}")
+
 
 if __name__ == '__main__':
     main()
