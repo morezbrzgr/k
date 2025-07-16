@@ -5,7 +5,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Call
 from collections import defaultdict
 
 # تنظیمات اولیه
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # توکن را از متغیر محیطی می‌خوانیم
 ADMIN_ID = 651775664  # ایدی ادمین
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -21,8 +21,8 @@ user_links = {}
 # دستور /start که دکمه‌ها را ارسال می‌کند
 async def start(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
-    if update.effective_user.id != ADMIN_ID:
-        await context.bot.send_message(chat_id=ADMIN_ID, text=f"کاربر جدید وارد ربات شد. شناسه کاربری: {update.effective_user.id}")
+    if user_id != ADMIN_ID:
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f"کاربر جدید وارد ربات شد. شناسه کاربری: {user_id}")
     
     # لینک ناشناس منحصر به فرد برای هر کاربر
     if user_id not in user_links:
@@ -86,19 +86,13 @@ async def button(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
 
-    data = query.data.split('_')
-
-    # نمایش صندوق ورودی کاربر
+    # بررسی دکمه‌های فشرده‌شده
     if query.data == 'inbox':
         await inbox_handler(update, context)
-
-    # دیگر گزینه‌ها مانند تنظیمات و راهنما
     elif query.data == 'settings':
         await query.edit_message_text(text="این بخش تنظیمات است.")
-    
     elif query.data == 'help':
         await query.edit_message_text(text="برای استفاده از ربات از دکمه‌ها استفاده کنید.")
-    
     elif query.data == 'anonymous_link':
         await anonymous_link_handler(update, context)
 
@@ -159,4 +153,14 @@ async def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("settings", settings))
     application.add_handler(CallbackQueryHandler(button))
-    application.add_handler(MessageHandler(filters.TEXT, receive_anonymous_message))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, receive_anonymous_message))
+    application.add_handler(CommandHandler("help", help_handler))
+
+    # شروع اپلیکیشن
+    await application.run_polling()
+
+# فراخوانی تابع اصلی
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
+
