@@ -1,10 +1,21 @@
+from telegram.ext import Application, CommandHandler, CallbackContext
 
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters
-from telegram.ext import CallbackContext
-
-# توکن ربات تلگرام شما
+# توکن ربات خود را اینجا قرار دهید
 TOKEN = "7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA"
+async def start(update, context):
+    # دستورات ربات
+    await update.message.reply("سلام!")
+
+async def main():
+    application = Application.builder().token(TOKEN).build()
+    # اضافه کردن هندلر به ربات
+    application.add_handler(CommandHandler("start", start))
+    # اجرای ربات
+    await application.run_polling()
+
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(main())
 
 # فقط شما می‌توانید آیدی طرف مقابل رو ببینید
 YOUR_ID = 651775664  # این رو با آیدی خودتون جایگزین کنید
