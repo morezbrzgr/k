@@ -1,7 +1,7 @@
 import logging
 import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, CallbackContext, MessageHandler, Filters
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, CallbackContext, MessageHandler, filters
 from collections import defaultdict
 
 # تنظیمات اولیه
@@ -41,7 +41,7 @@ async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("سلام! لطفاً یکی از گزینه‌ها را انتخاب کنید:", reply_markup=reply_markup)
 
 # ذخیره پیام‌ها در صندوق ورودی هر کاربر
-async def save_message_to_inbox(user_id, message, from_user):
+async def save_message_to_inbox(user_id, message, from_user, context: CallbackContext):
     user_inboxes[user_id].append({"message": message, "from_user": from_user})  # ذخیره پیام و اطلاعات فرستنده
 
     # ارسال پیام جدید به ادمین
@@ -108,7 +108,7 @@ async def receive_anonymous_message(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
 
     # ذخیره پیام‌ها در صندوق ورودی کاربر
-    await save_message_to_inbox(user_id, message, update.effective_user)
+    await save_message_to_inbox(user_id, message, update.effective_user, context)
     await update.message.reply_text("پیام شما با موفقیت ثبت شد و در صندوق ورودی نمایش داده می‌شود!")
 
 # دستور برای مشاهده تنظیمات
@@ -159,7 +159,7 @@ async def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("settings", settings))
     application.add_handler(CallbackQueryHandler(button))
-    application.add_handler(MessageHandler(Filters.text & ~Filters.command, receive_anonymous_message))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, receive_anonymous_message))
 
     # اجرای ربات با polling
     await application.run_polling()
