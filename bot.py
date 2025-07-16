@@ -62,3 +62,26 @@ async def main():
 if __name__ == '__main__':
     import asyncio
     asyncio.run(main())
+from telegram import Update
+from telegram.ext import Application, CommandHandler, CallbackContext
+
+# توکن ربات خود را اینجا قرار دهید
+TOKEN = 'YOUR_BOT_TOKEN'
+
+async def start(update: Update, context: CallbackContext):
+    await update.message.reply_text('سلام! به ربات خوش آمدید.')
+
+async def main():
+    # ایجاد اپلیکیشن با توکن ربات
+    application = Application.builder().token(TOKEN).build()
+
+    # اضافه کردن هندلر برای دستور /start
+    application.add_handler(CommandHandler("start", start))
+
+    # شروع به کار ربات با polling
+    await application.run_polling()
+
+if __name__ == "__main__":
+    # اجرای main با استفاده از async
+    import asyncio
+    asyncio.run(main())
