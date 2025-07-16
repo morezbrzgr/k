@@ -5,7 +5,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Call
 from collections import defaultdict
 
 # تنظیمات اولیه
-TOKEN = os.getenv("YOUR_BOT_TOKEN")
+TOKEN = os.getenv("7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA")
 ADMIN_ID = 651775664  # ایدی ادمین
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -159,12 +159,5 @@ async def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("settings", settings))
     application.add_handler(CallbackQueryHandler(button))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, receive_anonymous_message))
+    application.add_handler(MessageHandler(filters.TEXT &_
 
-    # اجرای ربات با polling
-    await application.run_polling()
-
-# اجرای ربات
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
