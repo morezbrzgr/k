@@ -24,8 +24,7 @@ def connect_user(update: Update, context: CallbackContext) -> None:
     update.callback_query.message.reply_text("شما اکنون به مخاطب خاص وصل شدید!")
 
 def main():
-    token = 'YOUR_BOT_TOKEN'  # جایگزین کنید با توکن واقعی ربات
-
+    token = 'YOUR_BOT_TOKEN'  # 7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA
     updater = Updater(token)
     dispatcher = updater.dispatcher
 
