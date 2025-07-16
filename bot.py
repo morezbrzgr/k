@@ -5,7 +5,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Call
 from collections import defaultdict
 
 # تنظیمات اولیه
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # توکن را از متغیر محیطی می‌خوانیم
+TOKEN = "7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA"
 ADMIN_ID = 651775664  # ایدی ادمین
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
