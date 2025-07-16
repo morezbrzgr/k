@@ -5,7 +5,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Call
 from collections import defaultdict
 
 # تنظیمات اولیه
-TOKEN = os.getenv("7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA")
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ADMIN_ID = 651775664  # ایدی ادمین
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -159,5 +159,4 @@ async def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("settings", settings))
     application.add_handler(CallbackQueryHandler(button))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, receive_anonymous_message))
-
+    application.add_handler(MessageHandler(filters.TEXT, receive_anonymous_message))
