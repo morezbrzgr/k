@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters
+from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from telegram.ext import CallbackContext
 
 # توکن ربات تلگرام شما
@@ -11,12 +11,12 @@ YOUR_ID = 123456789  # این رو با آیدی خودتون جایگزین ک�
 # ذخیره اطلاعات چت‌ها
 chats = {}
 
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(
+async def start(update: Update, context: CallbackContext) -> None:
+    await update.message.reply_text(
         "سلام! این ربات برای چت ناشناس است. با ارسال پیام، شروع به چت کنید."
     )
 
-def forward_message(update: Update, context: CallbackContext) -> None:
+async def forward_message(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat.id
     text = update.message.text
 
@@ -33,40 +33,38 @@ def forward_message(update: Update, context: CallbackContext) -> None:
         if other_chat_id:
             chats[other_chat_id]["active"] = True
             chats[chat_id]["active"] = True
-            context.bot.send_message(other_chat_id, f"پیام از {chat_id}: {text}")
+            await context.bot.send_message(other_chat_id, f"پیام از {chat_id}: {text}")
         
         # ذخیره چت‌های ناشناس
         if chat_id not in chats:
             chats[chat_id] = {"active": False}
 
         # ارسال پاسخ که چت به طور ناشناس شروع شده
-        update.message.reply_text("پیام شما به طرف دیگر ارسال شد.")
+        await update.message.reply_text("پیام شما به طرف دیگر ارسال شد.")
     else:
-        update.message.reply_text("شما نمی‌توانید پیام خودتان را ارسال کنید.")
+        await update.message.reply_text("شما نمی‌توانید پیام خودتان را ارسال کنید.")
 
-def show_user_id(update: Update, context: CallbackContext) -> None:
+async def show_user_id(update: Update, context: CallbackContext) -> None:
     if update.message.chat.id == YOUR_ID:
         for user_id, chat in chats.items():
             if chat["active"]:
-                update.message.reply_text(f"آیدی طرف مقابل: {user_id}")
+                await update.message.reply_text(f"آیدی طرف مقابل: {user_id}")
     else:
-        update.message.reply_text("شما نمی‌توانید آیدی طرف مقابل را ببینید.")
+        await update.message.reply_text("شما نمی‌توانید آیدی طرف مقابل را ببینید.")
 
-def main() -> None:
+async def main() -> None:
     # به روزرسانی ربات
-    updater = Updater(TOKEN)
+    application = Application.builder().token(TOKEN).build()
 
     # دستورات ربات
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("myid", show_user_id))  # فقط خودتون می‌تونید اینو استفاده کنید
-    dp.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, forward_message))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("myid", show_user_id))  # فقط خودتون می‌تونید اینو استفاده کنید
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, forward_message))
 
     # شروع ربات
-    updater.start_polling()
-
-    # ربات رو در حالت دائمی راه‌اندازی می‌کنیم
-    updater.idle()
+    await application.run_polling()
 
 if __name__ == '__main__':
-    main()
+    import asyncio
+    asyncio.run(main())
+
