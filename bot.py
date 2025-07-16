@@ -1,55 +1,72 @@
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import CallbackContext
 
-# تعریف دستور start
+# توکن ربات تلگرام شما
+TOKEN = "YOUR_BOT_TOKEN"
+
+# فقط شما می‌توانید آیدی طرف مقابل رو ببینید
+YOUR_ID = 123456789  # این رو با آیدی خودتون جایگزین کنید
+
+# ذخیره اطلاعات چت‌ها
+chats = {}
+
 def start(update: Update, context: CallbackContext) -> None:
-    user = update.message.from_user
-    username = user.username if user.username else "کاربر ناشناس"
-    update.message.reply_text(f'سلام! من یک ربات تلگرام هستم.\nیوزرنیم شما: {username}')
+    update.message.reply_text(
+        "سلام! این ربات برای چت ناشناس است. با ارسال پیام، شروع به چت کنید."
+    )
 
-    # ایجاد دکمه برای وصلی کردن
-    keyboard = [
-        [InlineKeyboardButton("وصلم کن!", callback_data='connect_user')]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("اگر می‌خواهید به مخاطب خاصم وصل شوید:", reply_markup=reply_markup)
+def forward_message(update: Update, context: CallbackContext) -> None:
+    chat_id = update.message.chat.id
+    text = update.message.text
 
-# تعریف دستور echo که پیامی که کاربر می‌فرستد را برمی‌گرداند
-def echo(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(update.message.text)
+    # اگر پیام از طرف خود شما نیست، آن رو به کاربر دیگه ارسال کن
+    if chat_id != YOUR_ID:
+        # پیدا کردن چت ناشناس بعدی
+        other_chat_id = None
+        for user_id, chat in chats.items():
+            if user_id != chat_id and chat["active"] == False:
+                other_chat_id = user_id
+                break
+        
+        # اگر چت ناشناس پیدا شد، پیام رو ارسال کن
+        if other_chat_id:
+            chats[other_chat_id]["active"] = True
+            chats[chat_id]["active"] = True
+            context.bot.send_message(other_chat_id, f"پیام از {chat_id}: {text}")
+        
+        # ذخیره چت‌های ناشناس
+        if chat_id not in chats:
+            chats[chat_id] = {"active": False}
 
-# هندلر برای دکمه "وصلم کن!"
-def connect_user(update: Update, context: CallbackContext) -> None:
-    update.callback_query.answer()
-    update.callback_query.message.reply_text("شما اکنون به مخاطب خاص وصل شدید!")
+        # ارسال پاسخ که چت به طور ناشناس شروع شده
+        update.message.reply_text("پیام شما به طرف دیگر ارسال شد.")
+    else:
+        update.message.reply_text("شما نمی‌توانید پیام خودتان را ارسال کنید.")
 
-def main():
-    token = 'YOUR_BOT_TOKEN'  # 7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA
-    updater = Updater(token)
-    dispatcher = updater.dispatcher
+def show_user_id(update: Update, context: CallbackContext) -> None:
+    if update.message.chat.id == YOUR_ID:
+        for user_id, chat in chats.items():
+            if chat["active"]:
+                update.message.reply_text(f"آیدی طرف مقابل: {user_id}")
+    else:
+        update.message.reply_text("شما نمی‌توانید آیدی طرف مقابل را ببینید.")
 
-    # افزودن هندلر برای دستور start
-    dispatcher.add_handler(CommandHandler("start", start))
+def main() -> None:
+    # به روزرسانی ربات
+    updater = Updater(TOKEN)
 
-    # افزودن هندلر برای پیام‌ها
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
-
-    # افزودن هندلر برای دکمه "وصلم کن!"
-    dispatcher.add_handler(CallbackQueryHandler(connect_user, pattern='connect_user'))
+    # دستورات ربات
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("myid", show_user_id))  # فقط خودتون می‌تونید اینو استفاده کنید
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, forward_message))
 
     # شروع ربات
     updater.start_polling()
 
-    # ربات را تا وقتی که به صورت دستی متوقف نشود اجرا می‌کند
+    # ربات رو در حالت دائمی راه‌اندازی می‌کنیم
     updater.idle()
-    from PIL import Image
-
-# باز کردن تصویر
-image = Image.open('your_image.jpg')  # مسیر تصویر خود را وارد کنید
-
-# شناسایی نوع تصویر
-print(f"The image format is: {image.format}")
-
 
 if __name__ == '__main__':
     main()
