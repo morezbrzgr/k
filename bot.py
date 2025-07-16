@@ -56,7 +56,7 @@ async def get_users(update: Update, context: CallbackContext):
     await update.message.reply_text("کاربران جدید از لینک ناشناس وارد شده‌اند.")
 
 # تابع اصلی که اپلیکیشن را راه‌اندازی می‌کند
-async def main():
+def main():
     application = Application.builder().token(TOKEN).build()
 
     # اضافه کردن هندلرها
@@ -65,11 +65,9 @@ async def main():
     application.add_handler(CallbackQueryHandler(button))
 
     # اجرای ربات با polling
-    await application.run_polling()
+    application.run_polling()
 
 # اجرای ربات
 if __name__ == "__main__":
-    import asyncio
-    # اجرا بدون نیاز به asyncio.run()
-    asyncio.get_event_loop().run_until_complete(main())
+    main()
 
