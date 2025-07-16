@@ -1,75 +1,41 @@
-import logging
-import os
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, CallbackContext
-
-# دریافت توکن از متغیر محیطی (در صورت نیاز به تغییر)
-TOKEN = os.getenv("7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA")
-ADMIN_ID = 651775664  # ایدی ادمین
-
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # دستور /start که دکمه‌ها را ارسال می‌کند
 async def start(update: Update, context: CallbackContext):
     if update.effective_user.id != ADMIN_ID:
         await context.bot.send_message(chat_id=ADMIN_ID, text=f"کاربر جدید وارد ربات شد. شناسه کاربری: {update.effective_user.id}")
-    
+
+    # ایجاد کیبورد برای نمایش در چت
     keyboard = [
-        [InlineKeyboardButton("تنظیمات", callback_data='settings')],
-        [InlineKeyboardButton("راهنما", callback_data='help')],
-        [InlineKeyboardButton("پیام به گروه", callback_data='send_to_group')],
-        [InlineKeyboardButton("لینک ناشناس من", callback_data='anonymous_link')],
-        [InlineKeyboardButton("به مخاطب خاصم وصلم کن", callback_data='special_contact')]
+        [KeyboardButton("تنظیمات")],
+        [KeyboardButton("راهنما")],
+        [KeyboardButton("پیام به گروه")],
+        [KeyboardButton("لینک ناشناس من")],
+        [KeyboardButton("به مخاطب خاصم وصلم کن")]
     ]
     
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
+
     await update.message.reply_text("سلام! لطفاً یکی از گزینه‌ها را انتخاب کنید:", reply_markup=reply_markup)
 
 # هندلر برای دکمه‌ها
 async def button(update: Update, context: CallbackContext):
-    query = update.callback_query
-    await query.answer()
+    text = update.message.text
 
-    if query.data == 'settings':
-        await query.edit_message_text(text="این بخش تنظیمات است.")
+    if text == 'تنظیمات':
+        await update.message.reply_text("این بخش تنظیمات است.")
     
-    elif query.data == 'help':
-        await query.edit_message_text(text="برای استفاده از ربات از دکمه‌ها استفاده کنید.")
+    elif text == 'راهنما':
+        await update.message.reply_text("برای استفاده از ربات از دکمه‌ها استفاده کنید.")
     
-    elif query.data == 'send_to_group':
-        await query.edit_message_text(text="پیام به گروه ارسال شد.")
+    elif text == 'پیام به گروه':
+        await update.message.reply_text("پیام به گروه ارسال شد.")
     
-    elif query.data == 'anonymous_link':
+    elif text == 'لینک ناشناس من':
         user_id = update.effective_user.id
         anonymous_link = f"https://t.me/{context.bot.username}?start={user_id}"
-        await query.edit_message_text(text=f"لینک ناشناس شما: {anonymous_link}")
+        await update.message.reply_text(f"لینک ناشناس شما: {anonymous_link}")
     
-    elif query.data == 'special_contact':
-        await query.edit_message_text(text="شما به مخاطب خاص وصل شدید.")
-
-# دستور برای مشاهده کاربران
-async def get_users(update: Update, context: CallbackContext):
-    if update.effective_user.id != ADMIN_ID:
-        await update.message.reply_text("شما دسترسی ندارید!")
-        return
-    await update.message.reply_text("کاربران جدید از لینک ناشناس وارد شده‌اند.")
-
-# تابع اصلی که اپلیکیشن را راه‌اندازی می‌کند
-async def main():
-    application = Application.builder().token(TOKEN).build()
-
-    # اضافه کردن هندلرها
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("get_users", get_users))
-    application.add_handler(CallbackQueryHandler(button))
-
-    # اجرای ربات با polling
-    await application.run_polling()
-
-# اجرای ربات
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    elif text == 'به مخاطب خاصم وصلم کن':
+        await update.message.reply_text("شما به مخاطب خاص وصل شدید.")
