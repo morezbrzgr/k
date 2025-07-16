@@ -6,7 +6,7 @@ from telegram.ext import CallbackContext
 TOKEN = "7835116613:AAEuZ5mwjpNrozXR75Jjjy4wNhEiwJcprDA"
 
 # فقط شما می‌توانید آیدی طرف مقابل رو ببینید
-YOUR_ID = @morezbrzgr  # این رو با آیدی خودتون جایگزین کنید
+YOUR_ID = 651775664  # این رو با آیدی خودتون جایگزین کنید
 
 # ذخیره اطلاعات چت‌ها
 chats = {}
