@@ -9,6 +9,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# دستور /start که دکمه‌ها را ارسال می‌کند
 async def start(update: Update, context: CallbackContext):
     if update.effective_user.id != ADMIN_ID:
         await context.bot.send_message(chat_id=ADMIN_ID, text=f"کاربر جدید وارد ربات شد. شناسه کاربری: {update.effective_user.id}")
@@ -25,6 +26,7 @@ async def start(update: Update, context: CallbackContext):
     
     await update.message.reply_text("سلام! لطفاً یکی از گزینه‌ها را انتخاب کنید:", reply_markup=reply_markup)
 
+# هندلر برای دکمه‌ها
 async def button(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
@@ -46,42 +48,27 @@ async def button(update: Update, context: CallbackContext):
     elif query.data == 'special_contact':
         await query.edit_message_text(text="شما به مخاطب خاص وصل شدید.")
 
+# دستور برای مشاهده کاربران
 async def get_users(update: Update, context: CallbackContext):
     if update.effective_user.id != ADMIN_ID:
         await update.message.reply_text("شما دسترسی ندارید!")
         return
     await update.message.reply_text("کاربران جدید از لینک ناشناس وارد شده‌اند.")
 
+# تابع اصلی که اپلیکیشن را راه‌اندازی می‌کند
 async def main():
     application = Application.builder().token(TOKEN).build()
+
+    # اضافه کردن هندلرها
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("get_users", get_users))
     application.add_handler(CallbackQueryHandler(button))
+
+    # اجرای ربات با polling
     await application.run_polling()
 
-if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
-from telegram import Update
-from telegram.ext import Application, CommandHandler, CallbackContext
-
-# توکن ربات خود را اینجا قرار دهید
-TOKEN = 'YOUR_BOT_TOKEN'
-
-async def start(update: Update, context: CallbackContext):
-    await update.message.reply_text('سلام! به ربات خوش آمدید.')
-
-async def main():
-    # ایجاد اپلیکیشن با توکن ربات
-    application = Application.builder().token(TOKEN).build()
-
-    # اضافه کردن هندلر برای دستور /start
-    application.add_handler(CommandHandler("start", start))
-
-    # شروع به کار ربات با polling
-    await application.run_polling()
-
+# اجرای ربات
 if __name__ == "__main__":
-    # اجرای main با استفاده از async
     import asyncio
     asyncio.run(main())
+
